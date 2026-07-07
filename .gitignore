@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Logs and generated diagnostics
+log/
+logs/
+*.log
+inventory/
+tmp/
+*.tmp
+
+# Robot/runtime captures
+captures/
+capture_*.jpg
+capture_*.png
+latest*.jpg
+latest*.png
+*.bag
+*.db3
+rosbag2_*/
+
+# Secrets and local machine configuration
+.env
+.env.*
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+known_hosts
+ssh_config
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Large local references kept outside this repo
+*.tgz
+*.tar.gz
+*.zip
+*.pdf
