@@ -29,32 +29,17 @@
 3. 本项目已经验证过哪些接口和脚本。
 4. 本项目的安全规则、赛题校正规则和代码组织方式。
 
-### 1.1 新组员可以把项目放在哪里
+### 1.1 组员可以把项目放在哪里
 
-仓库不要求放在 `G:` 盘，也不要求本地文件夹必须叫 `Cyberdog_win`。选择一个自己有读写权限、方便使用 Git 和编辑器的位置即可，例如：
+选择一个自己有读写权限、方便使用 Git 和编辑器的位置即可，例如：
 
 ```text
 Windows:  D:\Projects\Cyberdog-race-2026
 Windows:  C:\Users\<your-name>\source\cyberdog-team
-Ubuntu:   /home/<your-name>/projects/cyberdog-race-2026
-macOS:    /Users/<your-name>/Projects/cyberdog-race-2026
+
 ```
 
-本地仓库文件夹可以自主命名。克隆示例：
 
-```powershell
-# Windows PowerShell；父目录和最后的本地文件夹名都可以替换
-cd D:\Projects
-git clone https://github.com/KikicriX/Cyberdog-race-2026.git cyberdog-team
-cd cyberdog-team
-```
-
-```bash
-# Ubuntu/macOS；也可以使用自己习惯的父目录
-mkdir -p ~/projects
-cd ~/projects
-git clone https://github.com/KikicriX/Cyberdog-race-2026.git cyberdog-team
-cd cyberdog-team
 ```
 
 打开编辑器或 AI 工具时，应打开包含 `README.md`、`docs/` 和 `robot_runtime/` 的 `<repo-root>`，并把实际仓库根目录告诉 AI。不要只打开某个单独的 `.py` 文件，否则 AI 很难看到项目封装和安全约定。
