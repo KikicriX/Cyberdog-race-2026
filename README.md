@@ -11,33 +11,42 @@ CyberDog 2026 小米杯实体机赛道开发仓库。
 
 新组员或新的 AI 对话应先阅读以上两份文档，再结合 `README.md`、相关 `robot_runtime/` 文件、官方赛题 PDF 和当前实体机的只读接口探测结果开展工作。
 
-## 当前工作流
+## 本地目录与运行链路
 
-当前主开发入口已经迁移到 Windows 工作区：
+本仓库不绑定操作系统、盘符或本地文件夹名。组员可以把仓库克隆到任意有读写权限的位置，例如：
 
 ```text
-G:\Cyberdog_win
+Windows:  D:\Projects\Cyberdog-race-2026
+Ubuntu:   /home/<your-name>/projects/cyberdog-race-2026
+macOS:    /Users/<your-name>/Projects/cyberdog-race-2026
 ```
 
-推荐流程是：
+本地文件夹可以自主命名。编辑代码或让 AI 协助时，应打开包含 `README.md`、`docs/` 和 `robot_runtime/` 的仓库根目录，并使用仓库相对路径交流。
+
+通用运行链路是：
 
 ```text
-Windows 写代码
--> PowerShell 工具同步到机器狗
--> SSH 到机器狗
+任意个人电脑编写和检查代码
+-> 使用 SSH/SCP 或个人同步工具传到机器狗
 -> 机器狗端加载 ROS2 / CyberDog 环境
--> 机器狗端 python3 运行脚本
+-> 机器狗端使用 python3 运行脚本
 ```
 
-Windows 本机不直接运行 `robot_runtime/*.py`。这些脚本依赖 CyberDog NX 端的 ROS2 Galactic、`protocol` 消息/服务和机器狗 DDS 环境。
-
-机器狗端运行目录约定为：
+个人电脑不直接运行 `robot_runtime/*.py`。这些脚本依赖 CyberDog NX 端的 ROS2 Galactic、`protocol` 消息/服务和机器狗 DDS 环境。机器狗端默认运行目录为：
 
 ```text
 /home/mi/cyberdog_course/program
 ```
 
-Windows 侧推荐使用 SSH 配置别名 `cyberdog-win`，不要把真实机器狗 IP、密码或私有密钥提交到公开仓库。
+当前维护者使用 `G:\Cyberdog_win` 作为 Windows 实体机操作工作区，并将仓库的 `robot_runtime/` 对应到本地 `program/robot_runtime/`；PowerShell 推送脚本和 SSH 别名 `cyberdog-win` 也只是该工作区的辅助方式。其他组员无需复刻这些路径、名称或工具，但不要把真实机器狗 IP、密码或私有密钥提交到公开仓库。
+
+## AI 协作方式
+
+项目不要求所有组员使用同一个 AI 或相同的分工。可以让一个 AI 直接实现，也可以由人决定方案、AI 写代码，或者让 AI 只做计划、教学和审查。
+
+当前维护者经常采用“主 AI 做决策和审查，`cc` 执行部分任务”的方式；`cc` 是个人电脑上的本地执行入口，不是仓库或机器狗运行依赖。其他组员可以完全不使用它。
+
+开始任务时，建议告诉 AI 自己的操作系统、仓库根目录、连接方式、希望 AI 承担的角色、允许执行的操作和本次任务范围。详细示例见 [实体机开发与 AI 交接指南](docs/AI_CYBERDOG_DEVELOPMENT_GUIDE.md)。
 
 ## 当前目录
 
@@ -63,7 +72,7 @@ docs/
   development_notes.md               # 开发记录和当前优先级
 ```
 
-`robot_runtime/SH` 和旧的本机辅助 shell 脚本不是当前 Windows 主线入口。后续整理时会逐步把可复用逻辑迁移到 Windows PowerShell 工具或明确的机器狗端 runtime 脚本。
+`robot_runtime/SH` 和旧的本机辅助 shell 脚本保留作历史参考，不是所有组员都要使用的开发入口。可复用逻辑应逐步迁移到明确的机器狗端 runtime 脚本或有文档说明的平台辅助工具。
 
 ## 安全原则
 
@@ -80,8 +89,8 @@ docs/
 ## 开发约定
 
 - `main` 分支保存稳定版本和已审查文档。
-- 新功能从 `dev` 或功能分支开发。
-- cc/自动助手提交建议进入 `cc/*` 分支，不直接推送 `main`。
+- 新功能从 `dev` 或功能分支开发；分支可以使用 `feature/...`、`fix/...`、`docs/...` 或团队约定的其他清晰名称。
+- AI 或自动化工具产生的修改同样先进入功能分支并接受审查，不要求使用 `cc/*` 命名，也不直接推送 `main`。
 - 赛道功能按模块推进：基础动作、相机感知、第一关石板、第二关球阵、第三关黄线、第四关隧道、第五关独木桥、第六关终点。
 - 本地审查、日志、截图、真实机器狗连接信息不进入公开仓库。
 
