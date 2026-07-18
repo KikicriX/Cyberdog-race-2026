@@ -4,6 +4,13 @@ CyberDog 2026 小米杯实体机赛道开发仓库。
 
 这个公开仓库保存的是经过整理的实体机运行脚本和开发记录。真实调试时请始终以实体机安全为第一优先级：低速、可停、可恢复、可逐步验证。
 
+## 新成员与 AI 开发入口
+
+- [`docs/AI_CYBERDOG_DEVELOPMENT_GUIDE.md`](docs/AI_CYBERDOG_DEVELOPMENT_GUIDE.md)：说明代码依据、ROS 2 接口来源、推荐写法、SSH/SCP 部署、实体机验证顺序，以及应该交给 AI 的最小上下文。
+- [`docs/RACE_RULES_CORRECTED.md`](docs/RACE_RULES_CORRECTED.md)：记录小组确认后的六赛段规则理解，特别说明第四赛段目标和障碍需要现场识别，不能写死通道映射。
+
+新组员或新的 AI 对话应先阅读以上两份文档，再结合 `README.md`、相关 `robot_runtime/` 文件、官方赛题 PDF 和当前实体机的只读接口探测结果开展工作。
+
 ## 当前工作流
 
 当前主开发入口已经迁移到 Windows 工作区：
@@ -51,7 +58,9 @@ robot_runtime/
   SH/                      # 早期 Ubuntu 侧辅助脚本，保留作历史参考
 
 docs/
-  development_notes.md     # 开发记录和当前优先级
+  AI_CYBERDOG_DEVELOPMENT_GUIDE.md  # 实体机开发与 AI 交接入口
+  RACE_RULES_CORRECTED.md            # 六赛段规则理解校正版
+  development_notes.md               # 开发记录和当前优先级
 ```
 
 `robot_runtime/SH` 和旧的本机辅助 shell 脚本不是当前 Windows 主线入口。后续整理时会逐步把可复用逻辑迁移到 Windows PowerShell 工具或明确的机器狗端 runtime 脚本。
