@@ -81,6 +81,7 @@ $NoMotionScripts = @(
     "manual_tests/check_status.py"
     "perception/camera_view.py"
     "perception/ball_detect2.py"
+    "perception/fisheye_probe.py"
 )
 $motionRisk = $Script -notin $NoMotionScripts
 if ($motionRisk) {
