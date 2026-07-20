@@ -21,6 +21,7 @@ Copy-Item .\tools\config.example.ps1 .\tools\config.ps1
 .\tools\push_to_dog.ps1 -Files perception/camera_view.py
 .\tools\push_to_dog.ps1 -All
 .\tools\run_on_dog.ps1 -Script manual_tests/check_status.py -PushFirst
+.\tools\run_on_dog.ps1 -Script perception/fisheye_probe.py -PushFirst -Args "--duration","12"
 .\tools\start_camera_view.ps1 -PushFirst
 ```
 
