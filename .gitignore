@@ -41,8 +41,9 @@ id_ed25519*
 known_hosts
 ssh_config
 *.local.ps1
-tools/windows/config.ps1
-tools/windows/config.local.ps1
+tools/config.ps1
+tools/config.local.ps1
+.tools/
 
 # OS/editor
 .DS_Store

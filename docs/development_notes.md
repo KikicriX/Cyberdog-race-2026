@@ -44,7 +44,7 @@ Windows PowerShell
 -> 机器狗端 python3 <脚本>
 ```
 
-不要在 Windows 本机直接运行 `robot_runtime/*.py`。
+不要在 Windows 本机直接运行 `program/` 下依赖 ROS2 / CyberDog 的 Python 脚本。
 
 ## 已确认链路
 

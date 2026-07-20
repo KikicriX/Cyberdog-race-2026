@@ -1,124 +1,100 @@
-# CyberDog Race 2026
+# CyberDog 2026 Windows 工作区
 
-CyberDog 2026 小米杯实体机赛道开发仓库。
+Windows 负责写代码、同步文件和远程启动；依赖 ROS2 / CyberDog 的程序仍在机器狗 NX 端运行。
 
-这个公开仓库保存的是经过整理的实体机运行脚本和开发记录。真实调试时请始终以实体机安全为第一优先级：低速、可停、可恢复、可逐步验证。
+## 目录约定
 
-## 新成员与 AI 开发入口
+- `program/`：活动代码，完整对应机器狗的 `/home/mi/cyberdog_course/program/`。
+- `program/core/`：动作、步态和控制台等基础控制模块。
+- `program/perception/`：相机、画面预览和视觉识别。
+- `program/manual_tests/`：状态检查及需要人工看护的站立、趴下测试。
+- `program/stages/`：后续按赛道阶段编写的任务代码。
+- `tools/`：Windows PowerShell 连接、同步和启动工具。
+- `legacy/`：旧 Ubuntu 主机工具和已停用实验，不会被 `push_to_dog.ps1 -All` 同步。
+- `docs/`：赛题、规则和项目笔记。
+- `log/`：Windows 侧运行日志。
 
-- [`docs/AI_CYBERDOG_DEVELOPMENT_GUIDE.md`](docs/AI_CYBERDOG_DEVELOPMENT_GUIDE.md)：说明代码依据、ROS 2 接口来源、推荐写法、SSH/SCP 部署、实体机验证顺序，以及应该交给 AI 的最小上下文。
-- [`docs/RACE_RULES_CORRECTED.md`](docs/RACE_RULES_CORRECTED.md)：记录小组确认后的六赛段规则理解，特别说明第四赛段目标和障碍需要现场识别，不能写死通道映射。
+新组员或新的 AI 对话请先阅读：
 
-新组员或新的 AI 对话应先阅读以上两份文档，再结合 `README.md`、相关 `robot_runtime/` 文件、官方赛题 PDF 和当前实体机的只读接口探测结果开展工作。
+- [`docs/AI_CYBERDOG_DEVELOPMENT_GUIDE.md`](docs/AI_CYBERDOG_DEVELOPMENT_GUIDE.md)
+- [`docs/RACE_RULES_CORRECTED.md`](docs/RACE_RULES_CORRECTED.md)
 
-## 本地目录与运行链路
+## 首次连接
 
-本仓库不绑定操作系统、盘符或本地文件夹名。组员可以把仓库克隆到任意有读写权限的位置，例如：
+先创建不会提交到 Git 的本地连接配置，并填写机器狗当前地址：
 
-```text
-Windows:  D:\Projects\Cyberdog-race-2026
-Ubuntu:   /home/<your-name>/projects/cyberdog-race-2026
-macOS:    /Users/<your-name>/Projects/cyberdog-race-2026
+```powershell
+Copy-Item .\tools\config.example.ps1 .\tools\config.ps1
 ```
 
-本地文件夹可以自主命名。编辑代码或让 AI 协助时，应打开包含 `README.md`、`docs/` 和 `robot_runtime/` 的仓库根目录，并使用仓库相对路径交流。
+确认电脑和机器狗处于可通信网络后运行：
 
-通用运行链路是：
-
-```text
-任意个人电脑编写和检查代码
--> 使用 SSH/SCP 或个人同步工具传到机器狗
--> 机器狗端加载 ROS2 / CyberDog 环境
--> 机器狗端使用 python3 运行脚本
+```powershell
+.\tools\connect_dog.ps1
 ```
 
-个人电脑不直接运行 `robot_runtime/*.py`。这些脚本依赖 CyberDog NX 端的 ROS2 Galactic、`protocol` 消息/服务和机器狗 DDS 环境。机器狗端默认运行目录为：
+相机启动器需要免密 SSH；只需配置一次：
 
-```text
-/home/mi/cyberdog_course/program
+```powershell
+.\tools\setup_ssh_key.ps1
 ```
 
-当前维护者使用 `G:\Cyberdog_win` 作为 Windows 实体机操作工作区，并将仓库的 `robot_runtime/` 对应到本地 `program/robot_runtime/`；PowerShell 推送脚本和 SSH 别名 `cyberdog-win` 也只是该工作区的辅助方式。其他组员无需复刻这些路径、名称或工具，但不要把真实机器狗 IP、密码或私有密钥提交到公开仓库。
+连接参数统一放在本地 `tools/config.ps1`；仓库只提供不含真实地址的 `tools/config.example.ps1`。
 
-## AI 协作方式
+## 打开相机画面
 
-项目不要求所有组员使用同一个 AI 或相同的分工。可以让一个 AI 直接实现，也可以由人决定方案、AI 写代码，或者让 AI 只做计划、教学和审查。
+第一次使用、代码刚更新或不确定狗内文件版本时运行：
 
-当前维护者经常采用“主 AI 做决策和审查，`cc` 执行部分任务”的方式；`cc` 是个人电脑上的本地执行入口，不是仓库或机器狗运行依赖。其他组员可以完全不使用它。
-
-开始任务时，建议告诉 AI 自己的操作系统、仓库根目录、连接方式、希望 AI 承担的角色、允许执行的操作和本次任务范围。详细示例见 [实体机开发与 AI 交接指南](docs/AI_CYBERDOG_DEVELOPMENT_GUIDE.md)。
-
-## 当前目录
-
-```text
-robot_runtime/
-  check_status.py          # 读取 motion_status，确认机器狗运动状态
-  stand1.py                # 低风险站立动作测试
-  down1.py                 # 低风险趴下动作测试
-  cyberdog_base.py         # 通用 ROS2 节点、安全检查和动作调用封装
-  cyberdog_actions.py      # 一次性动作表
-  cyberdog_gaits.py        # 步态动作表
-  cyberdog_console.py      # 终端控制台入口
-  cyberdog_camera.py       # 相机服务和图像订阅基础模块
-  camera_view.py           # 相机预览入口
-  ball_detect1.py          # 单色球检测探索脚本
-  ball_detect2.py          # 蓝球/橙球检测探索脚本
-  run_camera_view.sh       # 机器狗端相机预览启动包装
-  SH/                      # 早期 Ubuntu 侧辅助脚本，保留作历史参考
-
-docs/
-  AI_CYBERDOG_DEVELOPMENT_GUIDE.md  # 实体机开发与 AI 交接入口
-  RACE_RULES_CORRECTED.md            # 六赛段规则理解校正版
-  development_notes.md               # 开发记录和当前优先级
+```powershell
+.\tools\start_camera_view.ps1 -PushFirst
 ```
 
-`robot_runtime/SH` 和旧的本机辅助 shell 脚本保留作历史参考，不是所有组员都要使用的开发入口。可复用逻辑应逐步迁移到明确的机器狗端 runtime 脚本或有文档说明的平台辅助工具。
+确认狗内已经是最新版后可直接运行：
 
-## 安全原则
-
-实体机调试时默认遵守：
-
-- 人在旁边，手机 APP 急停可用。
-- 空旷地面先测试，低风险动作优先。
-- 不直接运行高速、跳跃、快速撞击、下台动作。
-- 每个动作前检查 `motion_status`。
-- 步态类程序必须有速度上限、角速度上限、持续时间和停止逻辑。
-- 感知丢失、状态异常、服务调用失败时停止或退出。
-- 高风险动作默认锁定或需要明确二次确认。
-
-## 开发约定
-
-- `main` 分支保存稳定版本和已审查文档。
-- 新功能从 `dev` 或功能分支开发；分支可以使用 `feature/...`、`fix/...`、`docs/...` 或团队约定的其他清晰名称。
-- AI 或自动化工具产生的修改同样先进入功能分支并接受审查，不要求使用 `cc/*` 命名，也不直接推送 `main`。
-- 赛道功能按模块推进：基础动作、相机感知、第一关石板、第二关球阵、第三关黄线、第四关隧道、第五关独木桥、第六关终点。
-- 本地审查、日志、截图、真实机器狗连接信息不进入公开仓库。
-
-## 已验证环境
-
-实体机环境：
-
-```text
-Ubuntu 18.04.5 LTS
-aarch64 / tegra
-ROS2 Galactic
-ROS_DOMAIN_ID=42
+```powershell
+.\tools\start_camera_view.ps1
 ```
 
-已验证链路包括：
+脚本会自动执行以下步骤：
 
-- SSH 连接机器狗。
-- `motion_status` 状态读取。
-- 低风险站立动作。
-- 相机服务、图像话题和网页预览。
-- 蓝色/橙色球的初步 HSV 视觉检测。
+1. 建立 Windows `127.0.0.1:18080` 到机器狗 `127.0.0.1:8080` 的 SSH 隧道。
+2. 在机器狗上启动 `program/perception/run_camera_view.sh`。
+3. 由该 shell 脚本加载 ROS2 环境并运行 `camera_view.py`。
+4. 页面就绪后打开浏览器 `http://127.0.0.1:18080/`。
 
-## 当前优先级
+`connect_dog.ps1` 主要用于检查连接或手动进入狗端；`start_camera_view.ps1` 会自行建立所需连接，因此不要求前一个 SSH 会话一直保持打开。按 `Ctrl-C` 停止相机预览和隧道。
 
-当前最合理的下一步不是直接写六关总状态机，而是先打牢基础安全层：
+## 同步与运行
 
-1. 强化 `cyberdog_base.py`：步态运行中持续检查状态，异常立即停止。
-2. 整理 `cyberdog_console.py`：默认隐藏高风险和极高风险动作。
-3. 整理远程运行入口：用明确白名单区分纯检查/感知脚本和可能运动的脚本。
-4. 统一相机启动逻辑，复用带 STOP/重试保护的相机基础模块。
-5. 再开始第一关“石径探路”的低速半自动原型。
+同步单个文件，并保留其功能子目录：
+
+```powershell
+.\tools\push_to_dog.ps1 -Files manual_tests/check_status.py
+```
+
+同步全部活动 Python / shell 文件：
+
+```powershell
+.\tools\push_to_dog.ps1 -All
+```
+
+在机器狗上运行状态检查：
+
+```powershell
+.\tools\run_on_dog.ps1 -Script manual_tests/check_status.py -PushFirst
+```
+
+不要直接在 Windows 本机运行 `program/` 下依赖 ROS2 的脚本。
+
+## Windows cc 执行区
+
+```powershell
+cd G:\Cyberdog_win
+.\cc_executor\start_cc.ps1
+```
+
+会话日志写入 `G:\Cyberdog_win\log\cc_sessions`。安全模式使用：
+
+```powershell
+.\cc_executor\start_cc.ps1 -Safe
+```

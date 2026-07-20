@@ -1,10 +1,10 @@
 # CyberDog 实体机开发与 AI 交接指南
 
-更新日期：2026-07-18
+更新日期：2026-07-20
 
 适用范围：CyberDog 2026 小米杯实体机赛道项目。本文既供新组员阅读，也可以直接作为新 AI 对话的首份上下文。
 
-目录约定：本文用 `<repo-root>` 表示每位组员自己的仓库根目录。公开 GitHub 仓库以 `<repo-root>/robot_runtime/` 作为机器狗端脚本目录；当前维护者的 Windows 工作区将它映射为 `G:\Cyberdog_win\program\robot_runtime/`。两者内容对应，但提交到仓库的代码和文档必须使用相对路径，不得依赖某位组员的盘符、用户名或绝对路径。
+目录约定：本文用 `<repo-root>` 表示每位组员自己的仓库根目录。仓库中的 `<repo-root>/program/` 完整对应机器狗的 `/home/mi/cyberdog_course/program/`。提交到仓库的代码和文档必须使用相对路径，不得依赖某位组员的盘符、用户名或绝对路径。
 
 ## 1. 先说结论
 
@@ -29,24 +29,86 @@
 3. 本项目已经验证过哪些接口和脚本。
 4. 本项目的安全规则、赛题校正规则和代码组织方式。
 
-### 1.1 组员可以把项目放在哪里
+### 1.1 新组员可以把项目放在哪里
 
-选择一个自己有读写权限、方便使用 Git 和编辑器的位置即可，例如：
+仓库不要求放在 `G:` 盘，也不要求本地文件夹必须叫 `Cyberdog_win`。选择一个自己有读写权限、方便使用 Git 和编辑器的位置即可，例如：
 
 ```text
 Windows:  D:\Projects\Cyberdog-race-2026
 Windows:  C:\Users\<your-name>\source\cyberdog-team
-
+Ubuntu:   /home/<your-name>/projects/cyberdog-race-2026
+macOS:    /Users/<your-name>/Projects/cyberdog-race-2026
 ```
 
+本地仓库文件夹可以自主命名。克隆示例：
 
+```powershell
+# Windows PowerShell；父目录和最后的本地文件夹名都可以替换
+cd D:\Projects
+git clone https://github.com/KikicriX/Cyberdog-race-2026.git cyberdog-team
+cd cyberdog-team
+```
 
+```bash
+# Ubuntu/macOS；也可以使用自己习惯的父目录
+mkdir -p ~/projects
+cd ~/projects
+git clone https://github.com/KikicriX/Cyberdog-race-2026.git cyberdog-team
+cd cyberdog-team
+```
 
-### 1.3 新组员第一次开始开发
+打开编辑器或 AI 工具时，应打开包含 `README.md`、`docs/` 和 `program/` 的 `<repo-root>`，并把实际仓库根目录告诉 AI。不要只打开某个单独的 `.py` 文件，否则 AI 很难看到项目封装和安全约定。
+
+### 1.2 哪些可以自选，哪些需要保持一致
+
+| 项目 | 是否可以自选 | 说明 |
+| --- | --- | --- |
+| 操作系统、编辑器、终端和 AI 工具 | 可以 | Windows、Ubuntu、macOS 均可；工具不是项目依赖 |
+| 本地父目录和仓库文件夹名 | 可以 | 只要 Git、编辑器和 AI 指向正确的 `<repo-root>` |
+| SSH 配置别名、本地日志目录和个人辅助脚本 | 可以 | 不把地址、密码、密钥和个人配置提交到公开仓库 |
+| AI 与人的分工方式 | 可以 | 可以让 AI 实现、只做计划、只做审查或边教边写 |
+| 功能分支名 | 可以 | 推荐使用 `feature/...`、`fix/...`、`docs/...` 等易懂名称 |
+| 新增任务脚本名 | 可以协商 | 使用有含义的 `snake_case.py`，例如 `stage2_ball_search.py` |
+| `program/`、`docs/` 等共享目录 | 不应个人改名 | 改名会破坏团队链接、部署脚本和 AI 上下文 |
+| 已有公共模块和接口 | 不应随意改名 | 例如 `cyberdog_base.py`；重构前先与小组确认引用范围 |
+| ROS 2 话题、服务、消息字段和动作 ID | 不能自定义 | 必须以实体机探测和官方定义为依据 |
+| 机器狗端运行目录 | 默认保持一致 | 团队默认 `<remote-program-dir>`；当前实体机通常为 `/home/mi/cyberdog_course/program` |
+
+原则很简单：**个人电脑上的摆放方式可以不同，Git 仓库里的相对结构和机器人接口必须一致。**
+
+### 1.3 AI 使用方式不是固定流程
+
+本项目不要求所有组员使用同一个 AI，也不要求采用相同的自动化方式。下面几种都可以：
+
+| 协作方式 | 人和 AI 的分工 | 适合情况 |
+| --- | --- | --- |
+| 单个 AI 直接完成 | 人说明目标和权限，AI 阅读、修改、验证并给出结果 | 熟悉项目、希望快速推进 |
+| 人做决策，AI 实现 | 人指定方案和文件，AI 负责代码与检查 | 人已经明确技术路线 |
+| AI 做决策，人执行 | AI 给出步骤和代码，人手动运行命令与实体机测试 | 需要严格掌握每一步 |
+| 主 AI 决策，执行器实施 | 主 AI 规划和审查，另一个 AI 或本地工具执行 | 需要分离决策、执行和复核 |
+| 教学模式 | AI 分模块解释，人逐段编写或确认 | 新组员学习 Python、ROS 2 和机器狗接口 |
+| 仅审查模式 | 人先写代码，AI 只检查风险、接口和测试缺口 | 已有实现，不希望 AI 主动改文件 |
+
+当前维护者经常采用“主 AI 做决策和审查，`cc` 执行部分任务”的方式。这里的 `cc` 只是当前维护者电脑上的本地执行入口，不是 CyberDog 仓库、ROS 2 或比赛程序的依赖；其他组员无需安装、模仿或使用它。
+
+无论采用哪种方式，开始任务前都应告诉 AI：
+
+```text
+我的操作系统：<Windows/Ubuntu/macOS>
+仓库根目录：<实际路径>
+机器狗连接方式：<SSH/SCP/本地封装；不要提供密码和私钥>
+希望 AI 的角色：<直接实现/先给方案/只审查/教学>
+允许 AI 执行的操作：<读取/修改/测试/提交；实体机动作默认不允许>
+本次任务：<目标、允许修改的文件、验收方式>
+```
+
+如果用户没有指定工作方式，AI 应先识别当前仓库和环境，再采用保守的合理方案；不应因为本文记录了某位维护者的工具，就强迫其他组员复刻相同目录或流程。
+
+### 1.4 新组员第一次开始开发
 
 1. 将仓库克隆到自己选择的目录，打开 `<repo-root>`。
 2. 阅读 `README.md`、本文和 `docs/RACE_RULES_CORRECTED.md`。
-3. 根据任务阅读相关 `robot_runtime/` 文件，不要一开始把整个电脑或全部日志交给 AI。
+3. 根据任务阅读相关 `program/` 文件，不要一开始把整个电脑或全部日志交给 AI。
 4. 告诉 AI 自己的环境、希望它承担的角色、允许修改的范围和是否允许执行命令。
 5. 从功能分支开始修改，先做语法、静态和录制数据验证。
 6. 通过 SSH/SCP 或自己的同步工具部署；实体机先只读探测，再低速、短时、有看护地测试。
@@ -321,21 +383,21 @@ python3 your_script.py
 
 ```powershell
 # 连接机器人
-.\tools\windows\connect_dog.ps1
+.\tools\connect_dog.ps1
 
 # 推送一个脚本
-.\tools\windows\push_to_dog.ps1 -Files check_status.py
+.\tools\push_to_dog.ps1 -Files manual_tests/check_status.py
 
 # 在机器人端运行
-.\tools\windows\run_on_dog.ps1 -Script check_status.py
+.\tools\run_on_dog.ps1 -Script manual_tests/check_status.py
 
 # 先推送再运行
-.\tools\windows\run_on_dog.ps1 -Script check_status.py -PushFirst
+.\tools\run_on_dog.ps1 -Script manual_tests/check_status.py -PushFirst
 ```
 
 这些 PowerShell 封装属于当前维护者的本地工作区工具，不是所有组员环境中的必选入口。缺少这些工具时，使用 8.1 节的 SSH/SCP 通用流程即可。
 
-Windows 本机不需要安装项目中的 `rclpy` 和 `protocol`，也不要直接执行仓库里的 `robot_runtime/*.py`。在当前维护者工作区中，对应路径是 `program/robot_runtime/*.py`。
+Windows 本机不需要安装项目中的 `rclpy` 和 `protocol`，也不要直接执行 `program/` 下依赖 ROS2 / CyberDog 的 Python 脚本。
 
 不同组员可以使用自己的 SSH 配置、Linux shell、IDE 或同步脚本，但仓库内的 Python 代码和远端运行目录约定应保持一致。机器人地址、账号和密钥放在各自本地配置中，不提交到 Git。
 
@@ -392,20 +454,20 @@ lane_3 = {"target": None, "obstacle": None, "completed": False}
 docs/AI_CYBERDOG_DEVELOPMENT_GUIDE.md
 docs/RACE_RULES_CORRECTED.md
 README.md
-robot_runtime/check_status.py
-robot_runtime/cyberdog_base.py
-robot_runtime/cyberdog_camera.py
-robot_runtime/cyberdog_actions.py
-robot_runtime/cyberdog_gaits.py
+program/manual_tests/check_status.py
+program/core/cyberdog_base.py
+program/perception/cyberdog_camera.py
+program/core/cyberdog_actions.py
+program/core/cyberdog_gaits.py
 ```
 
-当前维护者在 `G:\Cyberdog_win` 中工作时，上述 `robot_runtime/` 文件对应 `program/robot_runtime/`。若需要复用本地推送封装，可额外提供 `tools/windows/README.md`；该文件不是理解机器人 ROS 2 代码的必要前提。
+若需要复用 Windows 推送和启动封装，可额外提供 `tools/README.md`；该文件不是理解机器人 ROS2 代码的必要前提。
 
 按任务追加：
 
-- 动作任务：追加 `stand1.py`、`down1.py`、官方 `MotionID.msg` 和 `MotionResultCmd.srv`。
-- 连续移动：追加 `cyberdog_base.py`、官方 `MotionServoCmd.msg` 和当前机器人接口探测输出。
-- 视觉任务：追加 `camera_view.py`、`ball_detect2.py`、录制图片或视频，不要只给口头颜色描述。
+- 动作任务：追加 `program/manual_tests/stand1.py`、`program/manual_tests/down1.py`、官方 `MotionID.msg` 和 `MotionResultCmd.srv`。
+- 连续移动：追加 `program/core/cyberdog_base.py`、官方 `MotionServoCmd.msg` 和当前机器人接口探测输出。
+- 视觉任务：追加 `program/perception/camera_view.py`、`program/perception/ball_detect2.py`、录制图片或视频，不要只给口头颜色描述。
 - 赛道状态机：追加官方赛题 PDF、规则校正版、各单项能力的已验证记录。
 
 不要把密码、私钥、真实机器人 IP、Wi-Fi 信息、完整无关日志和 `captures/` 全目录直接喂给外部 AI。
@@ -425,7 +487,7 @@ robot_runtime/cyberdog_gaits.py
 请先阅读：
 1. docs/AI_CYBERDOG_DEVELOPMENT_GUIDE.md
 2. README.md
-3. 与本次任务相关的 robot_runtime 文件
+3. 与本次任务相关的 program 文件（按需选择 core、perception、manual_tests 或 stages）
 4. 本次提供的实体机 ros2 接口探测结果
 
 开发约束：
@@ -463,4 +525,3 @@ robot_runtime/cyberdog_gaits.py
 - AI 可以生成代码、测试和文档，但实体机运动执行必须由在场人员确认环境安全后进行。
 
 这份文档是开发入口，不替代实体机探测结果、官方消息定义和赛题原文。三者应与项目代码一起交给新的组员或 AI。
-
