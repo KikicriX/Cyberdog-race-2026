@@ -400,9 +400,7 @@ def main():
 
     if not args.no_web:
         server = start_preview_server(preview_state, args.web_host, args.web_port)
-        # 不在公开仓库中写死机器狗真实 IP；按现场网络替换 <robot-ip>。
         print(f"[WEB] open: http://<robot-ip>:{args.web_port}")
-        print(f"[WEB] ssh tunnel: http://127.0.0.1:{args.web_port}")
 
     rclpy.init()
     node = BallDetector(args, preview_state)
