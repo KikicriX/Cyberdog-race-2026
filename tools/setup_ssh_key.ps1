@@ -2,7 +2,7 @@ param(
     [string]$KeyPath = "$env:USERPROFILE\.ssh\cyberdog_ed25519"
 )
 
-. "$PSScriptRoot\config.ps1"
+. "$PSScriptRoot\load_config.ps1"
 
 $sshDir = Split-Path -Parent $KeyPath
 New-Item -ItemType Directory -Force -Path $sshDir | Out-Null
@@ -60,12 +60,12 @@ ssh -o BatchMode=yes cyberdog-win "echo key_login_ok"
 if ($LASTEXITCODE -eq 0) {
     Write-Host "[OK] Windows passwordless SSH is ready."
 
-    $toolConfigPath = Join-Path $PSScriptRoot "config.ps1"
+    $toolConfigPath = $CyberDogConfigPath
     $toolConfig = Get-Content -Raw -LiteralPath $toolConfigPath
     $toolConfig = $toolConfig -replace '(?m)^\$DogTarget\s*=\s*"\$DogUser@\$DogHost"\s*$', '$DogTarget = "cyberdog-win"'
     Set-Content -LiteralPath $toolConfigPath -Value $toolConfig -Encoding UTF8
 
-    Write-Host "[OK] Updated tools/config.ps1: DogTarget = cyberdog-win"
+    Write-Host "[OK] Updated local CyberDog config: DogTarget = cyberdog-win"
 } else {
     Write-Error "Passwordless SSH test failed."
     exit 1

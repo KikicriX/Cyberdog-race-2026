@@ -4,7 +4,7 @@ param(
     [switch]$PushFirst
 )
 
-. "$PSScriptRoot\config.ps1"
+. "$PSScriptRoot\load_config.ps1"
 
 if (-not (Test-Path -LiteralPath $LocalProgramDir -PathType Container)) {
     Write-Error "Local program directory not found: $LocalProgramDir"

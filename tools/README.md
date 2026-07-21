@@ -5,7 +5,7 @@
 ## 工具说明
 
 - `config.example.ps1`：不含真实地址的配置模板。
-- `config.ps1`：本地机器狗地址和目录配置，不提交到 Git。
+- `load_config.ps1`：优先加载 `local/config/cyberdog.ps1`，并兼容旧的 `tools/config.ps1`。
 - `connect_dog.ps1`：检查连接或打开交互式 SSH。
 - `setup_ssh_key.ps1`：配置 Windows 到机器狗的免密 SSH。
 - `push_to_dog.ps1`：递归同步 `.py` / `.sh`，保留 `core`、`perception` 等子目录。
@@ -15,7 +15,8 @@
 ## 常用命令
 
 ```powershell
-Copy-Item .\tools\config.example.ps1 .\tools\config.ps1
+New-Item -ItemType Directory -Force .\local\config
+Copy-Item .\tools\config.example.ps1 .\local\config\cyberdog.ps1
 .\tools\connect_dog.ps1
 .\tools\setup_ssh_key.ps1
 .\tools\push_to_dog.ps1 -Files perception/camera_view.py
