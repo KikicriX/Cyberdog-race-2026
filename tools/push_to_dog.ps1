@@ -3,7 +3,7 @@ param(
     [switch]$All
 )
 
-. "$PSScriptRoot\config.ps1"
+. "$PSScriptRoot\load_config.ps1"
 
 New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 

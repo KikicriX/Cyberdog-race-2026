@@ -21,6 +21,9 @@ cc_executor/
 tmp/
 *.tmp
 
+# Workspace-local configuration, tools, references, and artifacts
+local/
+
 # Robot/runtime captures
 captures/
 capture_*.jpg

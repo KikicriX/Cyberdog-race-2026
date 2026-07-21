@@ -6,3 +6,7 @@
 *.txt text eol=lf
 *.toml text eol=lf
 LICENSE text eol=lf
+
+# These historical documents have non-normalized line endings; avoid full-file churn.
+docs/AI_CYBERDOG_DEVELOPMENT_GUIDE.md -text
+docs/RACE_RULES_CORRECTED.md -text
