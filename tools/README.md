@@ -23,7 +23,10 @@ Copy-Item .\tools\config.example.ps1 .\tools\config.ps1
 .\tools\run_on_dog.ps1 -Script manual_tests/check_status.py -PushFirst
 .\tools\run_on_dog.ps1 -Script perception/fisheye_probe.py -PushFirst -Args "--duration","12"
 .\tools\start_camera_view.ps1 -PushFirst
+.\tools\start_camera_view.ps1 -Source fisheye -PushFirst
 ```
+
+鱼眼默认读取 `/dev/video2` 和 `/dev/video3`，可通过 `-LeftDevice`、`-RightDevice` 覆盖。
 
 `start_camera_view.ps1` 必须使用免密 SSH，因为 SSH 隧道和狗端相机进程会在隐藏后台进程中启动，无法交互输入密码。
 
@@ -34,7 +37,8 @@ Windows tools/start_camera_view.ps1
   -> SSH 隧道和远程命令
   -> 狗内 program/perception/run_camera_view.sh
   -> camera_view.py
-  -> cyberdog_camera.py
+  -> RGB: cyberdog_camera.py
+  -> 鱼眼: cyberdog_fisheye.py -> /dev/video2 + /dev/video3
 ```
 
 旧的 Ubuntu 主机端 `connect_dog.sh`、`push_to_dog.sh` 和 `start_camera_view.sh` 已归档到 `legacy/ubuntu_tools/`，不属于当前 Windows 主流程。
