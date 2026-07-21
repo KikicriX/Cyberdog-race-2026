@@ -2,6 +2,10 @@ param(
     [int]$LocalPort = 18080,
     [int]$RemotePort = 8080,
     [int]$Duration = 3600,
+    [ValidateSet("rgb", "fisheye")]
+    [string]$Source = "rgb",
+    [string]$LeftDevice = "/dev/video2",
+    [string]$RightDevice = "/dev/video3",
     [switch]$PushFirst
 )
 
@@ -20,6 +24,7 @@ if ($LASTEXITCODE -ne 0) {
 if ($PushFirst) {
     & "$PSScriptRoot\push_to_dog.ps1" -Files @(
         "perception/cyberdog_camera.py"
+        "perception/cyberdog_fisheye.py"
         "perception/camera_view.py"
         "perception/run_camera_view.sh"
     )
@@ -70,7 +75,7 @@ try {
     }
 
     Write-Host "[INFO] Starting remote camera preview"
-    $remoteCommand = "cd '$RemoteProgramDir/perception' && ./run_camera_view.sh --duration $Duration --web-port $RemotePort"
+    $remoteCommand = "cd '$RemoteProgramDir/perception' && ./run_camera_view.sh --source $Source --duration $Duration --web-port $RemotePort --left-device '$LeftDevice' --right-device '$RightDevice'"
     $remote = Start-Process -FilePath "ssh" -ArgumentList @($DogTarget, $remoteCommand) -RedirectStandardOutput $remoteOutLog -RedirectStandardError $remoteErrorLog -PassThru -WindowStyle Hidden -ErrorAction Stop
 
     Write-Host "[INFO] Waiting for web page: $url"

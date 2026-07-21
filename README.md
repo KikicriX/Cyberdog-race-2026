@@ -55,6 +55,14 @@ Copy-Item .\tools\config.example.ps1 .\tools\config.ps1
 .\tools\start_camera_view.ps1
 ```
 
+左右鱼眼预览会直接读取两颗 OV9782，不调用原厂 `stereo_camera` lifecycle 节点：
+
+```powershell
+.\tools\start_camera_view.ps1 -Source fisheye -PushFirst
+```
+
+鱼眼模式要求 `/dev/video2` 和 `/dev/video3` 未被 MIVINS 或其他相机进程占用。
+
 脚本会自动执行以下步骤：
 
 1. 建立 Windows `127.0.0.1:18080` 到机器狗 `127.0.0.1:8080` 的 SSH 隧道。
